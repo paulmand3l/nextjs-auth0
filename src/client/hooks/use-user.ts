@@ -5,9 +5,9 @@ import useSWR from "swr";
 import type { User } from "../../types/index.js";
 import { normalizeWithBasePath } from "../../utils/pathUtils.js";
 
-export function useUser() {
+export function useUser(profilePath?: string): {
   const { data, error, isLoading, mutate } = useSWR<User, Error, string>(
-    normalizeWithBasePath(
+    profilePath ?? normalizeWithBasePath(
       process.env.NEXT_PUBLIC_PROFILE_ROUTE || "/auth/profile"
     ),
     (...args) =>
