@@ -170,4 +170,29 @@ describe("useUser Integration with SWR Cache", () => {
     expect(fetchSpy).toHaveBeenCalledOnce();
     expect(fetchSpy).toHaveBeenCalledWith("/auth/profile");
   });
+
+  it("should call the overridden profile path if provided", async () => {
+    fetchSpy.mockResolvedValueOnce(
+      new Response(JSON.stringify(initialUser), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      })
+    );
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <swrModule.SWRConfig value={{ provider: () => new Map() }}>
+        {children}
+      </swrModule.SWRConfig>
+    );
+
+    const { result } = renderHook(() => useUser('/custom/profile/path'), { wrapper });
+
+    // Wait for the initial data to load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.user).toEqual(initialUser);
+    expect(result.current.error).toBe(null);
+    expect(fetchSpy).toHaveBeenCalledOnce();
+    expect(fetchSpy).toHaveBeenCalledWith("/custom/profile/path");
+  });
 });

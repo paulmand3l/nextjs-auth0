@@ -76,6 +76,24 @@ describe("useUser", () => {
     expect(typeof result.invalidate).toBe("function");
   });
 
+  it("should accept an overridden profile path", () => {
+    // Mock SWR default export (useSWR hook) to return user data for this test
+    vi.mocked(swrModule.default).mockImplementationOnce(() => ({
+      data: mockUser,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: mockMutate
+    }));
+
+    const result = useUser('/custom/profile/path');
+
+    expect(result.isLoading).toBe(false);
+    expect(result.user).toBe(mockUser);
+    expect(result.error).toBe(null);
+    expect(typeof result.invalidate).toBe("function");
+  });
+
   it("should return error when fetch fails", () => {
     const mockError = new Error("Unauthorized");
     // Mock SWR default export (useSWR hook) to return error for this test
